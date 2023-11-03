@@ -18,19 +18,78 @@
     <div id="app" style="font-family: undefined;">Assesment click</div>
     <script id="appTemplate" type="text/template">
         <b-container>
-            <b-row class="mb-3">
+            <b-row class="mb-4">
                 <b-col>
                     <b-button @click="navToAssessment">Click to do {{ entity.client_name }}'s Assessment</b-button>
                 </b-col>
             </b-row>
-            <b-row class="mb-3">
-                <b-col>
-                    <b-button @click="sendNeeuroFitEmailAccountCreation" variant="success">Create NeeuroFit Account {{ entity.client_name }}'s Assessment</b-button>
+            <b-row class="mb-4">
+                <b-col class="col-12">
+                    <span class="font-weight-bold" style="font-size: 1.2rem;">NeeuroFit Account Creation</span>
+                </b-col>
+                <b-col class="col-6">
+                    <b-form-group
+                        id="form-neeurofit-start-date"
+                        label="Start Date"
+                        label-for="input-neeurofit-start-date"
+                    >
+                        <b-form-input id="input-neeurofit-start-date" type="date"></b-form-input>
+                    </b-form-group>
+                </b-col>
+                <b-col class="col-6">
+                    <b-form-group
+                        id="form-neeurofit-end-date"
+                        label="End Date"
+                        label-for="input-neeurofit-end-date"
+                    >
+                        <b-form-input id="input-neeurofit-end-date" type="date" :disabled="true"></b-form-input>
+                    </b-form-group>
+                </b-col>
+                <b-col class="col-12">
+                    <b-button @click="sendNeeuroFitEmailAccountCreation" variant="success" disabled>Create NeeuroFit Account {{ entity.client_name }}'s Assessment</b-button>
+                </b-col>
+            </b-row>
+            <b-row class="mb-4">
+                <b-col class="col-12">
+                    <span class="font-weight-bold" style="font-size: 1.2rem;">NeeuroFit Account Renewal</span>
+                </b-col>
+                <b-col class="col-6">
+                    <b-form-group
+                        id="form-neeurofit-renew-start-date"
+                        label="Start Date"
+                        label-for="input-neeurofit-renew-start-date"
+                    >
+                        <b-form-input id="input-neeurofit-renew-start-date" type="date"></b-form-input>
+                    </b-form-group>
+                </b-col>
+                <b-col class="col-6">
+                    <b-form-group
+                        id="form-neeurofit-renew-end-date"
+                        label="End Date"
+                        label-for="input-neeurofit-renew-end-date"
+                    >
+                        <b-form-input id="input-neeurofit-renew-end-date" type="date" :disabled="true"></b-form-input>
+                    </b-form-group>
+                </b-col>
+                <b-col class="col-12">
+                    <b-button variant="success" @click="sendNeeuroFitEmailAccountDeactivation" disabled>Renew NeeuroFit Account {{ entity.client_name }}'s Assessment</b-button>
                 </b-col>
             </b-row>
             <b-row>
-                <b-col>
-                    <b-button variant="danger" @click="sendNeeuroFitEmailAccountDeactivation">Deactivate NeeuroFit Account {{ entity.client_name }}'s Assessment</b-button>
+                <b-col class="col-12">
+                    <span class="font-weight-bold" style="font-size: 1.2rem;">NeeuroFit Account Deactivation</span>
+                </b-col>
+                <b-col class="col-6">
+                    <b-form-group
+                        id="form-neeurofit-deactivate-date"
+                        label="Date Deactivation"
+                        label-for="input-neeurofit-deactivate-date"
+                    >
+                        <b-form-input id="input-neeurofit-deactivate-date" type="date"></b-form-input>
+                    </b-form-group>
+                </b-col>
+                <b-col class="col-12">
+                    <b-button variant="danger" @click="sendNeeuroFitEmailAccountDeactivation" disabled>Deactivate NeeuroFit Account {{ entity.client_name }}'s Assessment</b-button>
                 </b-col>
             </b-row>
         </b-container>
@@ -83,7 +142,8 @@
                             console.log("sendNeeuroFitEmailAccountCreation ");
     
                             const payload = {
-                                subject: `NeeuroFit Account Creation for ${this.entity.client_name}`,
+                                // TODO: remove (TEST) when live
+                                subject: `NeeuroFit Account Creation for ${this.entity.client_name} (TEST)`,
                                 messageBody: [
                                     "Hi Kwee Eng",
                                     "New NeeuroFit account:",
@@ -117,6 +177,7 @@
                             
                         } catch (error) {
                             console.error(error);
+                            alert("Sending NeeuroFit account creation failed")
                         }
 
                     },
@@ -125,7 +186,8 @@
                             const BASE_URL_NEEUROFIT_ACCOUNT_DEACTIVATION_EMAIL = "https://prod.dx0vjh7tbhwvp.amplifyapp.com/api/emailNeeurofitAccountCreation/account-deactivation";
 
                             const payload = {
-                                subject: `NeeuroFit Account Deactivation for ${this.entity.client_name}`,
+                                // TODO: remove (TEST) when live
+                                subject: `NeeuroFit Account Deactivation for ${this.entity.client_name} (TEST)`,
                                 messageBody: [
                                         "Hi Kwee Eng",
                                         "NeeuroFit Account Deactivation:",
@@ -155,6 +217,7 @@
                             
                         } catch (error) {
                             console.error(error);
+                            alert("Sending NeeuroFit account deactivation failed")
                         }
                     }
                 },
