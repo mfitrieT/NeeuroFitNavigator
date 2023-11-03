@@ -33,7 +33,7 @@
                         label="Start Date"
                         label-for="input-neeurofit-start-date"
                     >
-                        <b-form-input id="input-neeurofit-start-date" type="date"></b-form-input>
+                        <b-form-input id="input-neeurofit-start-date" type="date" v-model="neeurofit.creation.startDate"></b-form-input>
                     </b-form-group>
                 </b-col>
                 <b-col class="col-6">
@@ -42,7 +42,7 @@
                         label="End Date"
                         label-for="input-neeurofit-end-date"
                     >
-                        <b-form-input id="input-neeurofit-end-date" type="date" :disabled="true"></b-form-input>
+                        <b-form-input id="input-neeurofit-end-date" type="date" :disabled="true" v-model="neeurofit.creation.endDate"></b-form-input>
                     </b-form-group>
                 </b-col>
                 <b-col class="col-12">
@@ -59,7 +59,7 @@
                         label="Start Date"
                         label-for="input-neeurofit-renew-start-date"
                     >
-                        <b-form-input id="input-neeurofit-renew-start-date" type="date"></b-form-input>
+                        <b-form-input id="input-neeurofit-renew-start-date" type="date" v-model="neeurofit.renewal.startDate"></b-form-input>
                     </b-form-group>
                 </b-col>
                 <b-col class="col-6">
@@ -68,7 +68,7 @@
                         label="End Date"
                         label-for="input-neeurofit-renew-end-date"
                     >
-                        <b-form-input id="input-neeurofit-renew-end-date" type="date" :disabled="true"></b-form-input>
+                        <b-form-input id="input-neeurofit-renew-end-date" type="date" :disabled="true" v-model="neeurofit.renewal.endDate"></b-form-input>
                     </b-form-group>
                 </b-col>
                 <b-col class="col-12">
@@ -85,7 +85,7 @@
                         label="Date Deactivation"
                         label-for="input-neeurofit-deactivate-date"
                     >
-                        <b-form-input id="input-neeurofit-deactivate-date" type="date"></b-form-input>
+                        <b-form-input id="input-neeurofit-deactivate-date" type="date" v-model="neeurofit.deactivation.date"></b-form-input>
                     </b-form-group>
                 </b-col>
                 <b-col class="col-12">
@@ -124,6 +124,19 @@
                     return {
                         entity,
                         clientid: '',
+                        neeurofit: {
+                            creation: {
+                                startDate: null,
+                                endDate: null,
+                            },
+                            renewal: {
+                                startDate: null,
+                                endDate: null,
+                            },
+                            deactivation: {
+                                date: null,
+                            }
+                        },
                     }
                 },
                 methods: {
