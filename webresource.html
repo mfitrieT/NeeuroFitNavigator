@@ -46,7 +46,10 @@
                     </b-form-group>
                 </b-col>
                 <b-col class="col-12">
-                    <b-button @click="sendNeeuroFitEmailAccountCreation" variant="success" disabled>Create NeeuroFit Account {{ entity.client_name }}'s Assessment</b-button>
+                    <b-button 
+                        variant="success" 
+                        @click="sendNeeuroFitEmailAccountCreation" 
+                    >Test Create NeeuroFit Account {{ entity.client_name }}'s Assessment</b-button>
                 </b-col>
             </b-row>
             <b-row class="mb-4">
@@ -72,7 +75,11 @@
                     </b-form-group>
                 </b-col>
                 <b-col class="col-12">
-                    <b-button variant="success" @click="sendNeeuroFitEmailAccountDeactivation" disabled>Renew NeeuroFit Account {{ entity.client_name }}'s Assessment</b-button>
+                    <b-button 
+                        variant="success" 
+                        disabled
+                        @click="sendNeeuroFitEmailAccountDeactivation" 
+                    >Renew NeeuroFit Account {{ entity.client_name }}'s Assessment</b-button>
                 </b-col>
             </b-row>
             <b-row>
@@ -89,7 +96,11 @@
                     </b-form-group>
                 </b-col>
                 <b-col class="col-12">
-                    <b-button variant="danger" @click="sendNeeuroFitEmailAccountDeactivation" disabled>Deactivate NeeuroFit Account {{ entity.client_name }}'s Assessment</b-button>
+                    <b-button 
+                        variant="danger" 
+                        disabled
+                        @click="sendNeeuroFitEmailAccountDeactivation" 
+                    >Deactivate NeeuroFit Account {{ entity.client_name }}'s Assessment</b-button>
                 </b-col>
             </b-row>
         </b-container>
@@ -102,6 +113,7 @@
             return {
                 client_name: raw.crb5c_no,
                 gender: raw.crb5c_sex,
+                dateOfBirth: raw.crb5c_birthdate,
             }
         }
 
@@ -110,7 +122,7 @@
             let entityId = window.top.Xrm.Page.data.entity.getId();
             let entityLogicalName = "crb5c_fow_customer";
             let options = new URLSearchParams({
-                $select: 'crb5c_no, crb5c_sex',
+                $select: 'crb5c_no, crb5c_sex, crb5c_birthdate',
                 $filter: `crb5c_fow_customerid eq '${entityId}'`,
             });
 
@@ -151,6 +163,17 @@
                             const LIST_GENDER = ["Male", "Female"];
 
                             const clientGender = LIST_GENDER[entity.gender];
+                            const dateOfBirth = entity.dateOfBirth;
+
+                            if(!clientGender){
+                                alert("This client does not have gender.");
+                                return;
+                            }
+
+                            if(!dateOfBirth){
+                                alert("This client does not have date of birth.");
+                                return;
+                            }
                             
                             console.log("sendNeeuroFitEmailAccountCreation ");
     
@@ -164,7 +187,9 @@
                                     `Email: DSG23001@edenlab.com`,
                                     // FIX; put actual date of birth data
                                     `Date of birth: 1/2/1968`,
+                                    // FIX: check if client gender is null
                                     `Gender: ${clientGender}`,
+                                    // FIX: put start date of neeurofit
                                     "Warm Regards,"
                                 ],
                                 footer: [
@@ -176,12 +201,12 @@
                                 footerLink: "http://www.alz.org.sg",
                                 senderEmail: "neeurofit-reports@dementia.org.sg",
                                 // TODO: comment when live
-                                // receiverEmail: "mfitrie789@yahoo.com",
-                                // CCEmail: ["m.fitrie@thunderquote.com"],
+                                receiverEmail: "mfitrie789@yahoo.com",
+                                CCEmail: ["m.fitrie@thunderquote.com"],
                                 // TODO: comment when live
                                 // TODO: uncomment when live
-                                receiverEmail: "robin_a12@hotmail.com",
-                                CCEmail: ['eunice.tan@dementia.org.sg', 'guanlai.choo@dementia.org.sg']
+                                // receiverEmail: "robin_a12@hotmail.com",
+                                // CCEmail: ['eunice.tan@dementia.org.sg', 'guanlai.choo@dementia.org.sg']
                                 // TODO: uncomment when live
                             }
 
@@ -194,6 +219,7 @@
                         }
 
                     },
+                    async sendNeeuroFitEmailAccountRenewal(){},
                     async sendNeeuroFitEmailAccountDeactivation(){
                         try {
                             const BASE_URL_NEEUROFIT_ACCOUNT_DEACTIVATION_EMAIL = "https://prod.dx0vjh7tbhwvp.amplifyapp.com/api/emailNeeurofitAccountCreation/account-deactivation";
@@ -206,6 +232,7 @@
                                         "NeeuroFit Account Deactivation:",
                                         `Name: ${this.entity.client_name}`,
                                         "Email: DSG23001@edenlab.com",
+                                        // FIX: put start deactivation date
                                         "Warm Regards,"
                                     ],
                                 footer: [
@@ -217,12 +244,12 @@
                                 footerLink: "http://www.alz.org.sg",
                                 senderEmail: "neeurofit-reports@dementia.org.sg",
                                 // TODO: comment when live
-                                // receiverEmail: "mfitrie789@yahoo.com",
-                                // CCEmail: ["m.fitrie@thunderquote.com"],
+                                receiverEmail: "mfitrie789@yahoo.com",
+                                CCEmail: ["m.fitrie@thunderquote.com"],
                                 // TODO: comment when live
                                 // TODO: uncomment when live
-                                receiverEmail: "robin_a12@hotmail.com",
-                                CCEmail: ['eunice.tan@dementia.org.sg', 'guanlai.choo@dementia.org.sg']
+                                // receiverEmail: "robin_a12@hotmail.com",
+                                // CCEmail: ['eunice.tan@dementia.org.sg', 'guanlai.choo@dementia.org.sg']
                                 // TODO: uncomment when live
                             }
 
@@ -232,7 +259,21 @@
                             console.error(error);
                             alert("Sending NeeuroFit account deactivation failed")
                         }
-                    }
+                    },
+                    isClientHasNeeuroFitAccount(clientId){},
+                    updateClientCreateRequestNeeuroFitAccount(clientId){
+                        // TODO: add neeurofit email 
+                        // TODO: add start date
+                        // TODO: add end date, 6 month after
+                    },
+                    updateClientDeactivateNeeuroFitAccount(clientId){
+                        // TODO: set neeurofit email to null
+                        // TODO: add deactivation date
+                    },
+                    updateClientRenewNeeuroFitAccount(clientId){
+                        // TODO: update start date
+                        // TODO: update end date, 6 month after
+                    },
                 },
             })
         });
