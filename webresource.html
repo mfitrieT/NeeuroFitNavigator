@@ -188,7 +188,7 @@
                         return entityId.replace(/[{}]/g, '');
 
                     },
-                    validationForCreateAndRenewInput(clientGender, dateOfBirth){
+                    validationForCreateAndRenewInput(clientGender, dateOfBirth, startDate, endDate){
                         if(!clientGender){
                             alert("This client does not have gender.");
                             return null;
@@ -199,7 +199,7 @@
                             return null;
                         };
 
-                        if(!this.neeurofit.creation.startDate && !this.addSixMonthToEndDateInNeeuroFitCreation){
+                        if(!startDate && !endDate){
                             alert("Please fill up the start date");
                             return null;
                         }
@@ -216,7 +216,7 @@
                             const dateOfBirth = entity.dateOfBirth;
 
                             //---- validation
-                            if(!this.validationForCreateAndRenewInput(clientGender, dateOfBirth)){
+                            if(!this.validationForCreateAndRenewInput(clientGender, dateOfBirth, this.neeurofit.creation.startDate, this.addSixMonthToEndDateInNeeuroFitCreation)){
                                 return;
                             };
                             //---- validation
@@ -230,6 +230,7 @@
 
                             const { crb5c_email } = await this.getNeeuroFitRecordTable(this.getClientIdWithoutCurlyBraces());
                             const formatDateOfBirth = dayjs(dateOfBirth).format("D/M/YYYY")
+                            const formatStartDate = dayjs(this.neeurofit.creation.startDate).format("D/M/YYYY");
                             const payload = {
                                 // TODO: remove (TEST) when live
                                 subject: `NeeuroFit Account Creation for ${this.entity.client_name} (TEST)`,
@@ -238,12 +239,9 @@
                                     "New NeeuroFit account:",
                                     `Name: ${this.entity.client_name}`,
                                     `Email: ${crb5c_email}`,
-                                    // FIX; put actual date of birth data
                                     `Date of birth: ${formatDateOfBirth}`,
-                                    // FIX: check if client gender is null
                                     `Gender: ${clientGender}`,
-                                    // FIX: put start date of neeurofit
-                                    // "Start Date: 20/1/2024",
+                                    `Start Date: ${formatStartDate}`,
                                     "Warm Regards,"
                                 ],
                                 footer: [
@@ -292,6 +290,7 @@
 
                             this.stateNeeuroFit.isHideDeactivation = true;
 
+                            const formatDeactivationDate = dayjs(endDate).format("D/M/YYYY");
                             const payload = {
                                 // TODO: remove (TEST) when live
                                 subject: `NeeuroFit Account Deactivation for ${this.entity.client_name} (TEST)`,
@@ -300,8 +299,7 @@
                                         "NeeuroFit Account Deactivation:",
                                         `Name: ${this.entity.client_name}`,
                                         "Email: DSG23001@edenlab.com",
-                                        // FIX: put start deactivation date
-                                        // "Deactivation Date: 20/1/2024",
+                                        `Deactivation Date: ${formatDeactivationDate}`,
                                         "Warm Regards,"
                                     ],
                                 footer: [
