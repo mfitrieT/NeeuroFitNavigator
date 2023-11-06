@@ -13,6 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.15/lodash.min.js"></script>
     <script src="https://unpkg.com/vue@2.7.10/dist/vue.js"></script>
     <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.7/dayjs.min.js"></script>
 
 <body>
     <div id="app" style="font-family: undefined;">Assesment click</div>
@@ -33,7 +34,7 @@
                         label="Start Date"
                         label-for="input-neeurofit-start-date"
                     >
-                        <b-form-input id="input-neeurofit-start-date" type="date" v-model="neeurofit.creation.startDate"></b-form-input>
+                        <b-form-input id="input-neeurofit-start-date" type="date" :disabled="stateNeeuroFit.isHideCreation" v-model="neeurofit.creation.startDate"></b-form-input>
                     </b-form-group>
                 </b-col>
                 <b-col class="col-6">
@@ -42,13 +43,14 @@
                         label="End Date"
                         label-for="input-neeurofit-end-date"
                     >
-                        <b-form-input id="input-neeurofit-end-date" type="date" :disabled="true" v-model="neeurofit.creation.endDate"></b-form-input>
+                        <b-form-input id="input-neeurofit-end-date" type="date" :disabled="true" :value="addSixMonthToEndDateInNeeuroFitCreation"></b-form-input>
                     </b-form-group>
                 </b-col>
                 <b-col class="col-12">
                     <b-button 
                         variant="success" 
-                        @click="sendNeeuroFitEmailAccountCreation" 
+                        :disabled="stateNeeuroFit.isHideCreation"
+                        @click="sendNeeuroFitEmailAccountCreation"
                     >Test Create NeeuroFit Account {{ entity.client_name }}'s Assessment</b-button>
                 </b-col>
             </b-row>
@@ -62,7 +64,7 @@
                         label="Start Date"
                         label-for="input-neeurofit-renew-start-date"
                     >
-                        <b-form-input id="input-neeurofit-renew-start-date" type="date" v-model="neeurofit.renewal.startDate"></b-form-input>
+                        <b-form-input id="input-neeurofit-renew-start-date" type="date" :disabled="stateNeeuroFit.isHideRenewal" v-model="neeurofit.renewal.startDate"></b-form-input>
                     </b-form-group>
                 </b-col>
                 <b-col class="col-6">
@@ -71,14 +73,14 @@
                         label="End Date"
                         label-for="input-neeurofit-renew-end-date"
                     >
-                        <b-form-input id="input-neeurofit-renew-end-date" type="date" :disabled="true" v-model="neeurofit.renewal.endDate"></b-form-input>
+                        <b-form-input id="input-neeurofit-renew-end-date" type="date" :disabled="true" :value="addSixMonthToEndDateInNeeuroFitRenewal"></b-form-input>
                     </b-form-group>
                 </b-col>
                 <b-col class="col-12">
                     <b-button 
-                        variant="success" 
-                        disabled
-                        @click="sendNeeuroFitEmailAccountDeactivation" 
+                        variant="success"
+                        :disabled="stateNeeuroFit.isHideRenewal"
+                        @click="sendNeeuroFitEmailAccountRenewal" 
                     >Renew NeeuroFit Account {{ entity.client_name }}'s Assessment</b-button>
                 </b-col>
             </b-row>
@@ -92,13 +94,13 @@
                         label="Date Deactivation"
                         label-for="input-neeurofit-deactivate-date"
                     >
-                        <b-form-input id="input-neeurofit-deactivate-date" type="date" v-model="neeurofit.deactivation.date"></b-form-input>
+                        <b-form-input id="input-neeurofit-deactivate-date" type="date" :disabled="stateNeeuroFit.isHideDeactivation" v-model="neeurofit.deactivation.date"></b-form-input>
                     </b-form-group>
                 </b-col>
                 <b-col class="col-12">
                     <b-button 
                         variant="danger" 
-                        disabled
+                        :disabled="stateNeeuroFit.isHideDeactivation"
                         @click="sendNeeuroFitEmailAccountDeactivation" 
                     >Deactivate NeeuroFit Account {{ entity.client_name }}'s Assessment</b-button>
                 </b-col>
@@ -136,14 +138,19 @@
                     return {
                         entity,
                         clientid: '',
+                        neeurofitEmailRecordEntityLogicalName: "crb5c_neeurofitemailrecord",
+                        dateFormatInputDate: "YYYY-MM-DD",
+                        stateNeeuroFit: {
+                            isHideCreation: true,
+                            isHideRenewal: true,
+                            isHideDeactivation: true,
+                        },
                         neeurofit: {
                             creation: {
                                 startDate: null,
-                                endDate: null,
                             },
                             renewal: {
                                 startDate: null,
-                                endDate: null,
                             },
                             deactivation: {
                                 date: null,
@@ -151,11 +158,54 @@
                         },
                     }
                 },
+                computed: {
+                    addSixMonthToEndDateInNeeuroFitCreation(){
+                        const startDate = this.neeurofit.creation.startDate;
+                        if(!startDate){
+                            return;
+                        }
+
+                        return dayjs(startDate).add(6, "month").format(this.dateFormatInputDate);
+
+                    },
+                    addSixMonthToEndDateInNeeuroFitRenewal(){
+                        const startDate = this.neeurofit.renewal.startDate;
+                        if(!startDate){
+                            return;
+                        }
+
+                        return dayjs(startDate).add(6, "month").format(this.dateFormatInputDate);
+                        
+                    }
+                },
                 methods: {
                     navToAssessment() {
                         console.log('ID:', entityId)
                         finalUrl = `https://fow-assessment-test.npo.sg/home/?client_id=${entityId}`;
                         window.open(finalUrl);
+                    },
+                    getClientIdWithoutCurlyBraces(){
+                        return entityId.replace(/[{}]/g, '');
+
+                    },
+                    validationForCreateAndRenewInput(clientGender, dateOfBirth){
+                        if(!clientGender){
+                            alert("This client does not have gender.");
+                            return null;
+                        }
+
+                        if(!dateOfBirth){
+                            alert("This client does not have date of birth.");
+                            return null;
+                        };
+
+                        if(!this.neeurofit.creation.startDate && !this.addSixMonthToEndDateInNeeuroFitCreation){
+                            alert("Please fill up the start date");
+                            return null;
+                        }
+
+                        return true;
+
                     },
                     async sendNeeuroFitEmailAccountCreation(){
                         try {
@@ -165,18 +215,20 @@
                             const clientGender = LIST_GENDER[entity.gender];
                             const dateOfBirth = entity.dateOfBirth;
 
-                            if(!clientGender){
-                                alert("This client does not have gender.");
+                            //---- validation
+                            if(!this.validationForCreateAndRenewInput(clientGender, dateOfBirth)){
                                 return;
-                            }
+                            };
+                            //---- validation
 
-                            if(!dateOfBirth){
-                                alert("This client does not have date of birth.");
-                                return;
-                            }
-                            
-                            console.log("sendNeeuroFitEmailAccountCreation ");
-    
+                            this.stateNeeuroFit.isHideCreation = true;
+
+                            await this.createRecordInNeerofitEmailRecord(this.getClientIdWithoutCurlyBraces(), {
+                                startDate: this.neeurofit.creation.startDate,
+                                endDate: this.addSixMonthToEndDateInNeeuroFitCreation,
+                            });
+
+                            const { crb5c_email } = await this.getNeeuroFitRecordTable(this.getClientIdWithoutCurlyBraces());
                             const payload = {
                                 // TODO: remove (TEST) when live
                                 subject: `NeeuroFit Account Creation for ${this.entity.client_name} (TEST)`,
@@ -184,12 +236,13 @@
                                     "Hi Kwee Eng",
                                     "New NeeuroFit account:",
                                     `Name: ${this.entity.client_name}`,
-                                    `Email: DSG23001@edenlab.com`,
+                                    `Email: ${crb5c_email}`,
                                     // FIX; put actual date of birth data
                                     `Date of birth: 1/2/1968`,
                                     // FIX: check if client gender is null
                                     `Gender: ${clientGender}`,
                                     // FIX: put start date of neeurofit
+                                    // "Start Date: 20/1/2024",
                                     "Warm Regards,"
                                 ],
                                 footer: [
@@ -210,12 +263,17 @@
                                 // TODO: uncomment when live
                             }
 
-                            axios.post(BASE_URL_NEEUROFIT_ACCOUNT_CREATION_EMAIL, payload);
+                            console.log("payload: ", payload);
 
+                            await axios.post(BASE_URL_NEEUROFIT_ACCOUNT_CREATION_EMAIL, payload);
                             
+                            alert("Sending NeeuroFit account creation success");
+
+                            this.stateNeeuroFit.isHideDeactivation = false;
+
                         } catch (error) {
                             console.error(error);
-                            alert("Sending NeeuroFit account creation failed")
+                            alert("Sending NeeuroFit account creation failed");
                         }
 
                     },
@@ -223,6 +281,15 @@
                     async sendNeeuroFitEmailAccountDeactivation(){
                         try {
                             const BASE_URL_NEEUROFIT_ACCOUNT_DEACTIVATION_EMAIL = "https://prod.dx0vjh7tbhwvp.amplifyapp.com/api/emailNeeurofitAccountCreation/account-deactivation";
+
+                            const endDate = this.neeurofit.deactivation.date;
+
+                            if(!endDate){
+                                alert("Please fill up the deactivation date");
+                                return;
+                            }
+
+                            this.stateNeeuroFit.isHideDeactivation = true;
 
                             const payload = {
                                 // TODO: remove (TEST) when live
@@ -254,13 +321,35 @@
                             }
 
                             axios.post(BASE_URL_NEEUROFIT_ACCOUNT_DEACTIVATION_EMAIL, payload);
+                            await this.deactivateNeeuroFitEmailRecord(this.getClientIdWithoutCurlyBraces(), endDate);
+
+                            alert("Sending NeeuroFit account deactivation success");
+
+                            this.stateNeeuroFit.isHideCreation = false;
                             
                         } catch (error) {
                             console.error(error);
-                            alert("Sending NeeuroFit account deactivation failed")
+                            alert("Sending NeeuroFit account deactivation failed");
                         }
                     },
-                    isClientHasNeeuroFitAccount(clientId){},
+                    async getNeeuroFitRecordTable(clientId){
+                        const params = new URLSearchParams({
+                            $select: 'crb5c_neeurofitemailrecordid, crb5c_id, crb5c_email, crb5c_startdate, crb5c_enddate, crb5c_deactivationdate',
+                            $filter: `_crb5c_client_value eq '${clientId}'`,
+                        });
+
+                        const { entities } = await window.top.Xrm.WebApi.retrieveMultipleRecords(this.neeurofitEmailRecordEntityLogicalName, '?' + params.toString());
+                        const record = entities.at(-1);
+
+                        console.log("getNeeuroFitRecordTable: ", record);
+
+                        if(!record){
+                            return null;
+                        }
+
+                        return record;
+
+                    },
                     updateClientCreateRequestNeeuroFitAccount(clientId){
                         // TODO: add neeurofit email 
                         // TODO: add start date
@@ -274,7 +363,105 @@
                         // TODO: update start date
                         // TODO: update end date, 6 month after
                     },
+                    async createRecordInNeerofitEmailRecord(clientId, dateObject){
+                        try {
+                            const createNewRecordNeeuroFitEmailRecord = async () => {
+                                const body = {}
+
+                                const { id: crb5c_neeurofitemailrecordid } = await window.top.Xrm.WebApi.createRecord(this.neeurofitEmailRecordEntityLogicalName, body);
+                                
+                                return crb5c_neeurofitemailrecordid;
+
+                            };
+
+                            const getCrb5c_neeurofitemailrecordidNeeuroFitEmailRecordAfterCreate = async (crb5c_neeurofitemailrecordid) => {
+                                const params = new URLSearchParams({
+                                    $select: 'crb5c_neeurofitemailrecordid, crb5c_id, crb5c_email',
+                                    $filter: `crb5c_neeurofitemailrecordid eq '${crb5c_neeurofitemailrecordid}'`,
+                                });
+
+                                const { entities } = await window.top.Xrm.WebApi.retrieveMultipleRecords(this.neeurofitEmailRecordEntityLogicalName, '?' + params.toString());
+                                console.log("getRecordNeeuroFitEmailRecord: ", entities);
+
+                                return entities[0].crb5c_id;
+
+                            };
+
+                            const updateRecordNeeuroFitEmailRecord = async (crb5c_neeurofitemailrecordid, crb5c_id, clientId) => {
+                                const formatYear = dayjs().format("YY");
+                                const formatNeeuroFitEmail = `DSG${formatYear}${crb5c_id}@edenlab.com`;
+
+                                const body = {
+                                    "crb5c_Client@odata.bind": `crb5c_fow_customers(${clientId})`,
+                                    crb5c_email: formatNeeuroFitEmail,
+                                    crb5c_startdate: dateObject.startDate,
+                                    crb5c_enddate: dateObject.endDate,
+                                    crb5c_deactivationdate: null,
+                                }
+
+                                const response = await window.top.Xrm.WebApi.updateRecord(this.neeurofitEmailRecordEntityLogicalName, crb5c_neeurofitemailrecordid, body);
+                                
+                                console.log("updateRecordNeeuroFitEmailRecord: ", response);
+
+                            };
+
+
+                            const crb5c_neeurofitemailrecordid = await createNewRecordNeeuroFitEmailRecord();
+                            const crb5c_id = await getCrb5c_neeurofitemailrecordidNeeuroFitEmailRecordAfterCreate(crb5c_neeurofitemailrecordid);
+                            await updateRecordNeeuroFitEmailRecord(crb5c_neeurofitemailrecordid, crb5c_id, clientId);
+
+                        } catch (error) {
+                            console.error(error);
+                            alert("Create record NeeuroFit Email failed");
+                        }
+                        
+
+
+                    },
+                    async deactivateNeeuroFitEmailRecord(clientId, endDate){
+                        try {
+                            const updateRecordNeeuroFitEmailRecord = async (crb5c_neeurofitemailrecordid) => {
+                                const body = {
+                                    crb5c_deactivationdate: endDate,
+                                }
+                                const response = await window.top.Xrm.WebApi.updateRecord(this.neeurofitEmailRecordEntityLogicalName, crb5c_neeurofitemailrecordid, body);
+                                
+                                console.log("updateRecordNeeuroFitEmailRecord: ", response);
+    
+                            }
+    
+                            const { crb5c_neeurofitemailrecordid } = await this.getNeeuroFitRecordTable(clientId);
+                            
+                            if(!crb5c_neeurofitemailrecordid){
+                                return;
+                            }
+    
+                            await updateRecordNeeuroFitEmailRecord(crb5c_neeurofitemailrecordid);
+                            
+                        } catch (error) {
+                            console.error(error);
+                            alert("Update record NeeuroFit Email deactivation failed");
+                        }
+
+                    }
                 },
+                async mounted(){
+                    const record = await this.getNeeuroFitRecordTable(this.getClientIdWithoutCurlyBraces());
+                    if(!record){
+                        this.stateNeeuroFit.isHideCreation = false;
+                        return;
+                    }
+
+                    // check account still active
+                    if(!record.crb5c_deactivationdate){
+                        this.stateNeeuroFit.isHideDeactivation = false;
+                        return;
+                    }
+
+                    this.stateNeeuroFit.isHideDeactivation = false;
+
+
+                }
             })
         });
 
