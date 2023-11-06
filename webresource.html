@@ -51,7 +51,7 @@
                         variant="success" 
                         :disabled="stateNeeuroFit.isHideCreation"
                         @click="sendNeeuroFitEmailAccountCreation"
-                    >Test Create NeeuroFit Account {{ entity.client_name }}'s Assessment</b-button>
+                    >Create NeeuroFit Account {{ entity.client_name }}'s Assessment</b-button>
                 </b-col>
             </b-row>
             <b-row class="mb-4">
@@ -229,6 +229,7 @@
                             });
 
                             const { crb5c_email } = await this.getNeeuroFitRecordTable(this.getClientIdWithoutCurlyBraces());
+                            const formatDateOfBirth = dayjs(dateOfBirth).format("D/M/YYYY")
                             const payload = {
                                 // TODO: remove (TEST) when live
                                 subject: `NeeuroFit Account Creation for ${this.entity.client_name} (TEST)`,
@@ -238,7 +239,7 @@
                                     `Name: ${this.entity.client_name}`,
                                     `Email: ${crb5c_email}`,
                                     // FIX; put actual date of birth data
-                                    `Date of birth: 1/2/1968`,
+                                    `Date of birth: ${formatDateOfBirth}`,
                                     // FIX: check if client gender is null
                                     `Gender: ${clientGender}`,
                                     // FIX: put start date of neeurofit
@@ -300,6 +301,7 @@
                                         `Name: ${this.entity.client_name}`,
                                         "Email: DSG23001@edenlab.com",
                                         // FIX: put start deactivation date
+                                        // "Deactivation Date: 20/1/2024",
                                         "Warm Regards,"
                                     ],
                                 footer: [
@@ -452,9 +454,12 @@
                         return;
                     }
 
-                    // check account still active
-                    if(!record.crb5c_deactivationdate){
+                    this.neeurofit.creation.startDate = dayjs(record.crb5c_startdate).format(this.dateFormatInputDate);
+
+                    if(record.crb5c_deactivationdate){
+                        this.neeurofit.deactivation.date = dayjs(record.crb5c_deactivationdate).format(this.dateFormatInputDate);
                         this.stateNeeuroFit.isHideDeactivation = false;
+
                         return;
                     }
 
