@@ -54,7 +54,7 @@
                     >Create NeeuroFit Account {{ entity.client_name }}'s Assessment</b-button>
                 </b-col>
             </b-row>
-            <b-row class="mb-4">
+            <!-- <b-row class="mb-4">
                 <b-col class="col-12">
                     <span class="font-weight-bold" style="font-size: 1.2rem;">NeeuroFit Account Renewal</span>
                 </b-col>
@@ -83,7 +83,7 @@
                         @click="sendNeeuroFitEmailAccountRenewal" 
                     >Renew NeeuroFit Account {{ entity.client_name }}'s Assessment</b-button>
                 </b-col>
-            </b-row>
+            </b-row> -->
             <b-row>
                 <b-col class="col-12">
                     <span class="font-weight-bold" style="font-size: 1.2rem;">NeeuroFit Account Deactivation</span>
@@ -452,14 +452,16 @@
                         return;
                     }
 
-                    this.neeurofit.creation.startDate = dayjs(record.crb5c_startdate).format(this.dateFormatInputDate);
-
+                    
                     if(record.crb5c_deactivationdate){
                         this.neeurofit.deactivation.date = dayjs(record.crb5c_deactivationdate).format(this.dateFormatInputDate);
-                        this.stateNeeuroFit.isHideDeactivation = false;
-
+                        this.stateNeeuroFit.isHideDeactivation = true;
+                        this.stateNeeuroFit.isHideCreation = false;
+                        
                         return;
                     }
+
+                    this.neeurofit.creation.startDate = dayjs(record.crb5c_startdate).format(this.dateFormatInputDate);
 
                     this.stateNeeuroFit.isHideDeactivation = false;
 
